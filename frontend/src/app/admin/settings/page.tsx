@@ -139,8 +139,6 @@ function ProfileTab() {
 
   const [name, setName] = React.useState("");
   const [phone, setPhone] = React.useState("");
-  const [emailNotif, setEmailNotif] = React.useState(true);
-  const [pushNotif, setPushNotif] = React.useState(false);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   React.useEffect(() => {
@@ -311,35 +309,6 @@ function ProfileTab() {
           </form>
         </CardContent>
       </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Notifications</CardTitle>
-          <CardDescription>Preferences are stored locally for now.</CardDescription>
-        </CardHeader>
-        <CardContent className="flex flex-col gap-3">
-          <Row
-            title="Email notifications"
-            description="Daily digests, new signups, and revenue alerts."
-            checked={emailNotif}
-            onChange={setEmailNotif}
-          />
-          <Row
-            title="Push notifications"
-            description="Real-time bookings and check-ins on mobile."
-            checked={pushNotif}
-            onChange={setPushNotif}
-          />
-        </CardContent>
-        <CardFooter className="justify-end gap-2">
-          <Button
-            variant="outline"
-            onClick={() => toast.message("Notification prefs not persisted yet")}
-          >
-            Reset
-          </Button>
-        </CardFooter>
-      </Card>
     </div>
   );
 }
@@ -466,51 +435,6 @@ function SecurityTab() {
           </form>
         </CardContent>
       </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Two-factor authentication</CardTitle>
-          <CardDescription>Not implemented yet.</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-start justify-between gap-4 rounded-md border border-border p-4 opacity-60">
-            <div className="flex items-start gap-3">
-              <span className="flex h-10 w-10 items-center justify-center rounded-md bg-primary/10 text-primary">
-                <Shield className="h-4 w-4" />
-              </span>
-              <div>
-                <div className="text-sm font-medium">Authenticator app</div>
-                <p className="text-xs text-muted-foreground">
-                  Coming in a later release.
-                </p>
-              </div>
-            </div>
-            <Switch checked={false} onCheckedChange={() => {}} disabled />
-          </div>
-        </CardContent>
-      </Card>
-    </div>
-  );
-}
-
-function Row({
-  title,
-  description,
-  checked,
-  onChange,
-}: {
-  title: string;
-  description: string;
-  checked: boolean;
-  onChange: (v: boolean) => void;
-}) {
-  return (
-    <div className="flex items-start justify-between gap-4 rounded-md border border-border p-4">
-      <div>
-        <div className="text-sm font-medium">{title}</div>
-        <div className="text-xs text-muted-foreground">{description}</div>
-      </div>
-      <Switch checked={checked} onCheckedChange={onChange} />
     </div>
   );
 }

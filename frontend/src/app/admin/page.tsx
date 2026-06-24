@@ -156,12 +156,7 @@ export default function AdminDashboardPage() {
       <PageHeader
         title="Dashboard"
         description="A pulse on members, revenue, and what's happening on the floor today."
-        actions={
-          <Button variant="outline" size="sm">
-            <Download className="h-4 w-4" />
-            Export
-          </Button>
-        }
+
       />
 
       {(analyticsQ.isError || classesQ.isError) && (

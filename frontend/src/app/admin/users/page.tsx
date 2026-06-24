@@ -1,13 +1,13 @@
 "use client";
 
 import * as React from "react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   ChevronDown,
   ChevronLeft,
   ChevronRight,
   Eye,
   Filter,
+  KeyRound,
   Loader2,
   MoreHorizontal,
   Pencil,
@@ -21,6 +21,7 @@ import {
   XCircle,
   CheckCircle2,
 } from "lucide-react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import {
   ApiError,
@@ -39,10 +40,7 @@ import { Avatar } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { EmptyState } from "@/components/ui/empty-state";
-import {
-  Dialog,
-  DialogContent,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -67,12 +65,14 @@ function RoleBadge({ role }: { role: UserRole }) {
         <Shield className="mr-1 h-3 w-3" /> Admin
       </Badge>
     );
+
   if (role === "TRAINER")
     return (
       <Badge variant="secondary">
         <Shield className="mr-1 h-3 w-3" /> Trainer
       </Badge>
     );
+
   return (
     <Badge variant="outline">
       <Shield className="mr-1 h-3 w-3" /> Member
@@ -85,6 +85,7 @@ export default function MembersPage() {
     queryKey: ["admin", "members"],
     queryFn: () => api.get<MemberRow[]>("/api/admin/users"),
   });
+
   const walletsQ = useQuery({
     queryKey: ["admin", "wallets"],
     queryFn: () => api.get<WalletSummary[]>("/api/admin/wallets"),
@@ -97,6 +98,7 @@ export default function MembersPage() {
   }, [walletsQ.data]);
 
   const queryClient = useQueryClient();
+
   const deleteMember = useMutation({
     mutationFn: (id: string) => api.del<void>(`/api/admin/users/${id}`),
     onSuccess: () => {
@@ -125,22 +127,28 @@ export default function MembersPage() {
     null
   );
 
+  const [resetTarget, setResetTarget] = React.useState<MemberRow | null>(null);
+
   const filtered = React.useMemo(() => {
     const items = membersQ.data ?? [];
     return items.filter((m) => {
       if (roleFilter !== "ALL" && m.role !== roleFilter) return false;
+
       if (statusFilter !== "ALL") {
         const active = statusFilter === "ACTIVE";
         if (m.active !== active) return false;
       }
+
       if (query) {
         const q = query.toLowerCase();
         if (
           !m.fullName.toLowerCase().includes(q) &&
           !m.email.toLowerCase().includes(q)
-        )
+        ) {
           return false;
+        }
       }
+
       return true;
     });
   }, [membersQ.data, query, roleFilter, statusFilter]);
@@ -174,6 +182,7 @@ export default function MembersPage() {
             className="pl-9"
           />
         </div>
+
         <div className="flex items-center gap-2">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -188,6 +197,7 @@ export default function MembersPage() {
                 <ChevronDown className="h-3 w-3" />
               </Button>
             </DropdownMenuTrigger>
+
             <DropdownMenuContent>
               <DropdownMenuItem onSelect={() => setRoleFilter("ALL")}>
                 Any role
@@ -214,11 +224,12 @@ export default function MembersPage() {
                   {statusFilter === "ALL"
                     ? "Any"
                     : statusFilter.charAt(0) +
-                    statusFilter.slice(1).toLowerCase()}
+                      statusFilter.slice(1).toLowerCase()}
                 </span>
                 <ChevronDown className="h-3 w-3" />
               </Button>
             </DropdownMenuTrigger>
+
             <DropdownMenuContent>
               <DropdownMenuItem onSelect={() => setStatusFilter("ALL")}>
                 Any status
@@ -264,10 +275,12 @@ export default function MembersPage() {
                   <th className="font-medium py-3 px-5 w-12"></th>
                 </tr>
               </thead>
+
               <tbody>
                 {filtered.map((m) => {
                   const cents = balanceByUserId.get(m.id);
                   const empty = cents == null || cents === 0;
+
                   return (
                     <tr
                       key={m.id}
@@ -284,17 +297,21 @@ export default function MembersPage() {
                           </div>
                         </div>
                       </td>
+
                       <td className="py-3 px-5 text-muted-foreground">
                         {m.email}
                       </td>
+
                       <td className="py-3 px-5">
                         <RoleBadge role={m.role} />
                       </td>
+
                       <td className="py-3 px-5">
                         <StatusBadge
                           status={m.active ? "ACTIVE" : "INACTIVE"}
                         />
                       </td>
+
                       <td className="py-3 px-5 text-right tabular-nums">
                         {walletsQ.isLoading ? (
                           <Skeleton className="ml-auto h-4 w-12" />
@@ -311,6 +328,7 @@ export default function MembersPage() {
                           </span>
                         )}
                       </td>
+
                       <td className="py-3 px-5 text-muted-foreground tabular-nums">
                         {new Date(m.joined).toLocaleDateString("en-US", {
                           month: "short",
@@ -318,6 +336,7 @@ export default function MembersPage() {
                           year: "numeric",
                         })}
                       </td>
+
                       <td className="py-3 px-5">
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
@@ -325,10 +344,12 @@ export default function MembersPage() {
                               <MoreHorizontal className="h-4 w-4" />
                             </button>
                           </DropdownMenuTrigger>
+
                           <DropdownMenuContent align="end">
                             <DropdownMenuItem onSelect={() => setSelected(m)}>
                               <Eye className="h-4 w-4" /> View details
                             </DropdownMenuItem>
+
                             <DropdownMenuItem
                               onSelect={() =>
                                 setTopUpTarget({
@@ -340,7 +361,15 @@ export default function MembersPage() {
                             >
                               <Plus className="h-4 w-4" /> Add credit
                             </DropdownMenuItem>
+
+                            <DropdownMenuItem
+                              onSelect={() => setResetTarget(m)}
+                            >
+                              <KeyRound className="h-4 w-4" /> Reset password
+                            </DropdownMenuItem>
+
                             <DropdownMenuSeparator />
+
                             {m.role === "USER" && (
                               <DropdownMenuItem
                                 className="text-destructive focus:text-destructive"
@@ -367,15 +396,18 @@ export default function MembersPage() {
             </table>
           </div>
         )}
+
         <div className="flex items-center justify-between border-t border-border px-5 py-3 text-xs text-muted-foreground">
           <span className="tabular-nums">
             Showing {filtered.length} of {membersQ.data?.length ?? 0}
           </span>
+
           <div className="flex items-center gap-1">
             <Button variant="outline" size="sm" disabled>
               <ChevronLeft className="h-4 w-4" />
               Previous
             </Button>
+
             <Button variant="outline" size="sm" disabled>
               Next <ChevronRight className="h-4 w-4" />
             </Button>
@@ -383,10 +415,7 @@ export default function MembersPage() {
         </div>
       </Card>
 
-      <Dialog
-        open={!!selected}
-        onOpenChange={(v) => !v && setSelected(null)}
-      >
+      <Dialog open={!!selected} onOpenChange={(v) => !v && setSelected(null)}>
         <DialogContent
           className="p-0"
           srTitle={selected ? `Member · ${selected.fullName}` : "Member details"}
@@ -396,6 +425,7 @@ export default function MembersPage() {
             <>
               <div className="flex items-start gap-4 p-6">
                 <Avatar name={selected.fullName} size="xl" />
+
                 <div className="flex-1 min-w-0">
                   <h2 className="text-xl font-semibold tracking-tight">
                     {selected.fullName}
@@ -403,6 +433,7 @@ export default function MembersPage() {
                   <p className="text-sm text-muted-foreground">
                     {selected.email}
                   </p>
+
                   <div className="mt-2 flex items-center gap-2">
                     <RoleBadge role={selected.role} />
                     <StatusBadge
@@ -410,6 +441,7 @@ export default function MembersPage() {
                     />
                   </div>
                 </div>
+
                 <button
                   onClick={() => setSelected(null)}
                   className="rounded-md p-1.5 hover:bg-accent"
@@ -417,6 +449,7 @@ export default function MembersPage() {
                   <X className="h-4 w-4" />
                 </button>
               </div>
+
               <div className="grid grid-cols-2 gap-4 px-6 pb-2">
                 <Field
                   label="Role"
@@ -439,28 +472,35 @@ export default function MembersPage() {
                   })}
                 />
               </div>
+
               <div className="px-6 pb-2">
                 <div className="rounded-lg border border-border bg-gradient-to-br from-primary/5 via-transparent to-transparent p-4 flex items-center justify-between gap-4">
                   <div className="flex items-center gap-3">
                     <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
                       <Wallet className="h-4 w-4" />
                     </span>
+
                     <div>
                       <div className="text-xs text-muted-foreground uppercase tracking-wider">
                         Wallet credit
                       </div>
                       <div className="text-xl font-semibold tabular-nums">
-                        ${((balanceByUserId.get(selected.id) ?? 0) / 100).toFixed(2)}
+                        $
+                        {(
+                          (balanceByUserId.get(selected.id) ?? 0) / 100
+                        ).toFixed(2)}
                       </div>
                     </div>
                   </div>
+
                   <Button
                     size="sm"
                     onClick={() => {
                       setTopUpTarget({
                         id: selected.id,
                         name: selected.fullName,
-                        balance: (balanceByUserId.get(selected.id) ?? 0) / 100,
+                        balance:
+                          (balanceByUserId.get(selected.id) ?? 0) / 100,
                       });
                       setSelected(null);
                     }}
@@ -470,17 +510,10 @@ export default function MembersPage() {
                   </Button>
                 </div>
               </div>
+
               <div className="flex items-center justify-end gap-2 p-6 pt-4">
                 <Button variant="outline" onClick={() => setSelected(null)}>
                   Close
-                </Button>
-                <Button
-                  onClick={() =>
-                    toast.message("Profile editing not wired yet")
-                  }
-                >
-                  <Pencil className="h-3.5 w-3.5" />
-                  Edit profile
                 </Button>
               </div>
             </>
@@ -488,14 +521,18 @@ export default function MembersPage() {
         </DialogContent>
       </Dialog>
 
-      <CreateMemberDialog
-        open={creating}
-        onClose={() => setCreating(false)}
-      />
+      <CreateMemberDialog open={creating} onClose={() => setCreating(false)} />
+
       <AddCreditDialog
         open={!!topUpTarget}
         onClose={() => setTopUpTarget(null)}
         member={topUpTarget}
+      />
+
+      <ResetPasswordDialog
+        open={!!resetTarget}
+        onClose={() => setResetTarget(null)}
+        member={resetTarget}
       />
     </div>
   );
@@ -522,6 +559,136 @@ function Field({
         {value}
       </div>
     </div>
+  );
+}
+
+function ResetPasswordDialog({
+  open,
+  onClose,
+  member,
+}: {
+  open: boolean;
+  onClose: () => void;
+  member: MemberRow | null;
+}) {
+  const [password, setPassword] = React.useState("");
+  const [reason, setReason] = React.useState("Admin reset requested by user.");
+  const [errorMsg, setErrorMsg] = React.useState<string | null>(null);
+
+  React.useEffect(() => {
+    if (open) {
+      setPassword("");
+      setReason("Admin reset requested by user.");
+      setErrorMsg(null);
+    }
+  }, [open]);
+
+  const resetPassword = useMutation({
+    mutationFn: () =>
+      api.post(`/api/admin/users/${member?.id}/password-reset`, {
+        temporaryPassword: password,
+        reason,
+      }),
+    onSuccess: () => {
+      toast.success("Password reset successfully");
+      onClose();
+    },
+    onError: (err) => {
+      const msg =
+        err instanceof ApiError
+          ? err.message
+          : err instanceof Error
+            ? err.message
+            : "Could not reset password";
+      setErrorMsg(msg);
+    },
+  });
+
+  if (!member) return null;
+
+  return (
+    <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
+      <DialogContent
+        className="max-w-md p-0"
+        srTitle="Reset member password"
+        srDescription="Admin changes a user's temporary password"
+      >
+        <div className="p-6">
+          <div className="flex items-start gap-3">
+            <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
+              <KeyRound className="h-[18px] w-[18px]" />
+            </span>
+
+            <div>
+              <h2 className="text-lg font-semibold tracking-tight">
+                Reset password
+              </h2>
+              <p className="text-sm text-muted-foreground">
+                Set a temporary password for {member.fullName}.
+              </p>
+            </div>
+          </div>
+
+          <div className="mt-5 flex flex-col gap-4">
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="reset-password">Temporary password</Label>
+              <Input
+                id="reset-password"
+                type="password"
+                minLength={12}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="At least 12 characters"
+                autoComplete="new-password"
+              />
+
+              {password.length > 0 && password.length < 12 && (
+                <p className="text-xs text-destructive">
+                  Password must be at least 12 characters.
+                </p>
+              )}
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="reset-reason">Reason</Label>
+              <Input
+                id="reset-reason"
+                value={reason}
+                onChange={(e) => setReason(e.target.value)}
+              />
+            </div>
+
+            {errorMsg && (
+              <div className="rounded-md border border-destructive/30 bg-destructive/10 px-3 py-2 text-xs text-destructive">
+                {errorMsg}
+              </div>
+            )}
+          </div>
+
+          <div className="mt-6 flex justify-end gap-2">
+            <Button variant="outline" onClick={onClose}>
+              Cancel
+            </Button>
+
+            <Button
+              disabled={
+                password.length < 12 ||
+                !reason.trim() ||
+                resetPassword.isPending
+              }
+              onClick={() => resetPassword.mutate()}
+            >
+              {resetPassword.isPending ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <KeyRound className="h-4 w-4" />
+              )}
+              Reset password
+            </Button>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 }
 
@@ -603,6 +770,7 @@ function CreateMemberDialog({
                 <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
                   <UserPlus className="h-[18px] w-[18px]" />
                 </span>
+
                 <div>
                   <h2 className="text-lg font-semibold tracking-tight">
                     Create member account
@@ -613,6 +781,7 @@ function CreateMemberDialog({
                   </p>
                 </div>
               </div>
+
               <button
                 onClick={onClose}
                 className="rounded-md p-1.5 hover:bg-accent"
@@ -621,6 +790,7 @@ function CreateMemberDialog({
                 <X className="h-4 w-4" />
               </button>
             </div>
+
             <div className="px-6 pb-2 grid grid-cols-2 gap-4">
               <div className="col-span-2 flex flex-col gap-1.5">
                 <Label htmlFor="cm-name">Full name</Label>
@@ -632,6 +802,7 @@ function CreateMemberDialog({
                   required
                 />
               </div>
+
               <div className="col-span-2 flex flex-col gap-1.5">
                 <Label htmlFor="cm-email">Email</Label>
                 <Input
@@ -643,6 +814,7 @@ function CreateMemberDialog({
                   required
                 />
               </div>
+
               <div className="col-span-2 flex flex-col gap-1.5">
                 <Label htmlFor="cm-password">Initial password</Label>
                 <Input
@@ -655,12 +827,14 @@ function CreateMemberDialog({
                   minLength={12}
                   autoComplete="new-password"
                 />
+
                 {passwordTooShort && (
                   <p className="text-xs text-destructive">
                     Password must be at least 12 characters.
                   </p>
                 )}
               </div>
+
               <div className="col-span-2 flex flex-col gap-1.5">
                 <Label>Role</Label>
                 <div className="flex items-center gap-1 rounded-md bg-muted p-1">
@@ -687,12 +861,14 @@ function CreateMemberDialog({
                   ))}
                 </div>
               </div>
+
               <div className="col-span-2 flex flex-col gap-1.5">
-                <Label htmlFor="cm-credit">Welcome credit (optional)</Label>
+                <Label htmlFor="cm-credit">Welcome credit optional</Label>
                 <div className="relative">
                   <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">
                     $
                   </span>
+
                   <Input
                     id="cm-credit"
                     type="number"
@@ -704,28 +880,29 @@ function CreateMemberDialog({
                   />
                 </div>
               </div>
+
               {errorMsg && (
                 <div className="col-span-2 rounded-md border border-destructive/30 bg-destructive/10 px-3 py-2 text-xs text-destructive">
                   {errorMsg}
                 </div>
               )}
             </div>
+
             <div className="flex items-center justify-between p-6 pt-4">
               <span className="text-xs text-muted-foreground inline-flex items-center gap-1.5">
                 <Shield className="h-3 w-3" />
                 Admin-only action
               </span>
+
               <div className="flex items-center gap-2">
                 <Button variant="outline" onClick={onClose}>
                   Cancel
                 </Button>
+
                 <Button
                   onClick={submit}
                   disabled={
-                    !name ||
-                    !email ||
-                    password.length < 12 ||
-                    create.isPending
+                    !name || !email || password.length < 12 || create.isPending
                   }
                 >
                   {create.isPending ? (
@@ -743,6 +920,7 @@ function CreateMemberDialog({
             <div className="flex h-16 w-16 items-center justify-center rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400">
               <CheckCircle2 className="h-8 w-8" />
             </div>
+
             <div>
               <h3 className="text-lg font-semibold tracking-tight">
                 Account created
