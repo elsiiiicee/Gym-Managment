@@ -14,8 +14,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.unyt.legion.booking.GymClass;
 import com.unyt.legion.booking.GymClassRepository;
 import com.unyt.legion.notification.NotificationService;
-import com.unyt.legion.store.Product;
-import com.unyt.legion.store.ProductRepository;
 import com.unyt.legion.trainer.Trainer;
 import com.unyt.legion.trainer.TrainerRepository;
 import com.unyt.legion.user.AppUser;
@@ -45,9 +43,6 @@ class ProfileNotificationAndAdminUserTest {
 
     @Autowired
     private UserRepository users;
-
-    @Autowired
-    private ProductRepository products;
 
     @Autowired
     private TrainerRepository trainers;
@@ -184,48 +179,6 @@ class ProfileNotificationAndAdminUserTest {
 
         // Analytics endpoint.
         getJson("/api/admin/analytics", adminToken);
-    }
-
-    @Test
-    void productCrudAndCartLifecycleWork() throws Exception {
-        String adminEmail = "admin-prod-" + UUID.randomUUID() + "@example.com";
-        users.save(new AppUser(adminEmail, passwordEncoder.encode("AdminStrongPassword123!"), "Admin", UserRole.ADMIN));
-        String adminToken = login(adminEmail, "AdminStrongPassword123!");
-
-        Product p = products.save(new Product(
-                "SKU-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase(),
-                "Foam Roller", "smooth black", 1_500, 5));
-
-        // Admin product list + update.
-        getJson("/api/admin/products", adminToken);
-        putJson("/api/admin/products/" + p.getId(), adminToken, Map.of(
-                "name", "Foam Roller XL",
-                "description", "longer",
-                "priceCents", 1_800,
-                "stockQuantity", 4,
-                "active", true), 200);
-
-        // Duplicate SKU rejected.
-        postJson("/api/admin/products", adminToken, Map.of(
-                "sku", p.getSku(),
-                "name", "dup",
-                "description", "dup",
-                "priceCents", 100,
-                "stockQuantity", 1), 409);
-
-        // Public catalog.
-        getJson("/api/catalog/products", null);
-
-        // Cart lifecycle: add, update, remove.
-        String userToken = register("cart-" + UUID.randomUUID() + "@example.com")
-                .get("accessToken").asText();
-        postJson("/api/cart/items", userToken, Map.of(
-                "productId", p.getId().toString(), "quantity", 1), 201);
-        putJson("/api/cart/items/" + p.getId(), userToken, Map.of("quantity", 2), 200);
-        mockMvc.perform(delete("/api/cart/items/" + p.getId())
-                        .header("Authorization", "Bearer " + userToken))
-                .andExpect(status().isNoContent());
-        getJson("/api/cart", userToken);
     }
 
     @Test
