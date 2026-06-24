@@ -9,7 +9,6 @@ import {
   Eye,
   Filter,
   Loader2,
-  Mail,
   MoreHorizontal,
   Pencil,
   Plus,
@@ -96,6 +95,26 @@ export default function MembersPage() {
     (walletsQ.data ?? []).forEach((w) => map.set(w.userId, w.balanceCents));
     return map;
   }, [walletsQ.data]);
+
+  const queryClient = useQueryClient();
+  const deleteMember = useMutation({
+    mutationFn: (id: string) => api.del<void>(`/api/admin/users/${id}`),
+    onSuccess: () => {
+      toast.success("Member removed");
+      queryClient.invalidateQueries({ queryKey: ["admin", "members"] });
+      queryClient.invalidateQueries({ queryKey: ["admin", "wallets"] });
+      queryClient.invalidateQueries({ queryKey: ["admin", "subscriptions"] });
+    },
+    onError: (err) => {
+      const message =
+        err instanceof ApiError
+          ? err.message
+          : err instanceof Error
+            ? err.message
+            : "Could not remove member";
+      toast.error(message);
+    },
+  });
 
   const [query, setQuery] = React.useState("");
   const [roleFilter, setRoleFilter] = React.useState<RoleFilter>("ALL");
@@ -195,7 +214,7 @@ export default function MembersPage() {
                   {statusFilter === "ALL"
                     ? "Any"
                     : statusFilter.charAt(0) +
-                      statusFilter.slice(1).toLowerCase()}
+                    statusFilter.slice(1).toLowerCase()}
                 </span>
                 <ChevronDown className="h-3 w-3" />
               </Button>
@@ -321,26 +340,23 @@ export default function MembersPage() {
                             >
                               <Plus className="h-4 w-4" /> Add credit
                             </DropdownMenuItem>
-                            <DropdownMenuItem
-                              onSelect={() =>
-                                toast.message(
-                                  "Email sending not implemented yet"
-                                )
-                              }
-                            >
-                              <Mail className="h-4 w-4" /> Send email
-                            </DropdownMenuItem>
                             <DropdownMenuSeparator />
-                            <DropdownMenuItem
-                              className="text-destructive focus:text-destructive"
-                              onSelect={() =>
-                                toast.message(
-                                  "Deactivate not wired in this view yet"
-                                )
-                              }
-                            >
-                              <XCircle className="h-4 w-4" /> Deactivate
-                            </DropdownMenuItem>
+                            {m.role === "USER" && (
+                              <DropdownMenuItem
+                                className="text-destructive focus:text-destructive"
+                                onSelect={() => {
+                                  if (
+                                    confirm(
+                                      `Delete ${m.fullName}? This cannot be undone.`
+                                    )
+                                  ) {
+                                    deleteMember.mutate(m.id);
+                                  }
+                                }}
+                              >
+                                <XCircle className="h-4 w-4" /> Deactivate
+                              </DropdownMenuItem>
+                            )}
                           </DropdownMenuContent>
                         </DropdownMenu>
                       </td>

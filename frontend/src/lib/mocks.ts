@@ -1,6 +1,5 @@
 // Static demo data for things the backend doesn't (and probably won't)
-// expose: activity feed, dashboard charts, plan distribution, heatmap,
-// member-app screens. Removed everything that now has a real endpoint.
+// expose: activity feed, dashboard charts, plan distribution, heatmap.
 
 // ---------------------------------------------------------------- activity
 
@@ -67,78 +66,3 @@ export const ATTENDANCE_HEATMAP = {
   ],
 };
 
-// ---------------------------------------------------------------- member-app
-// The member-app preview page is a pure visual mockup — keep its data here.
-
-export const MEMBER_ME = {
-  id: "usr_9b73",
-  fullName: "Priya Sharma",
-  email: "priya.s@example.com",
-  plan: "Member",
-  joined: "2024-11-04",
-  creditBalance: 42.5,
-  visitsThisMonth: 14,
-  nextRenewal: "Jun 4, 2026",
-  passCode: "LEG-9B73-A412-PKDQ",
-};
-
-export interface MemberBooking {
-  id: string;
-  name: string;
-  trainer: string;
-  when: string;
-  category: string;
-  status: "CONFIRMED" | "PENDING";
-}
-
-export const MEMBER_BOOKINGS: MemberBooking[] = [
-  { id: "mb1", name: "Sunrise HIIT", trainer: "Jordan Alvarez", when: "Today · 6:30 AM", category: "HIIT", status: "CONFIRMED" },
-  { id: "mb2", name: "Vinyasa Flow", trainer: "Maya Chen", when: "Tomorrow · 9:00 AM", category: "Yoga", status: "CONFIRMED" },
-  { id: "mb3", name: "Pilates Core", trainer: "Isabella Rossi", when: "Fri · 11:00 AM", category: "Pilates", status: "PENDING" },
-];
-
-export interface MemberTxn {
-  id: string;
-  label: string;
-  when: string;
-  amount: number;
-}
-
-export const MEMBER_TXNS: MemberTxn[] = [
-  { id: "t1", label: "Credit added by Maya Chen", when: "May 22", amount: 25.0 },
-  { id: "t2", label: "Spin & Sweat · drop-in", when: "May 18", amount: -8.5 },
-  { id: "t3", label: "Sports massage", when: "May 10", amount: -45.0 },
-  { id: "t4", label: "Monthly membership", when: "May 1", amount: -89.0 },
-  { id: "t5", label: "Credit added by Maya Chen", when: "Apr 28", amount: 75.0 },
-];
-
-export const MEMBER_CATEGORIES: Array<{ key: string; hueA: number; hueB: number }> = [
-  { key: "HIIT", hueA: 244, hueB: 290 },
-  { key: "Yoga", hueA: 173, hueB: 200 },
-  { key: "Strength", hueA: 24, hueB: 0 },
-  { key: "Cardio", hueA: 320, hueB: 350 },
-  { key: "Pilates", hueA: 280, hueB: 320 },
-  { key: "Recovery", hueA: 200, hueB: 230 },
-];
-
-// Sample classes for the Member-app preview (the real Classes admin page
-// reads /api/admin/classes). Kept here so the iOS frame demo doesn't depend
-// on the backend being seeded.
-export interface MemberAppClass {
-  id: string;
-  name: string;
-  trainerName: string;
-  schedule: string;
-  capacity: number;
-  enrolled: number;
-  durationMin: number;
-  category: string;
-}
-
-export const MEMBER_APP_CLASSES: MemberAppClass[] = [
-  { id: "cls_01", name: "Sunrise HIIT", trainerName: "Jordan Alvarez", schedule: "Mon · Wed · Fri · 6:30 AM", capacity: 20, enrolled: 18, durationMin: 45, category: "HIIT" },
-  { id: "cls_02", name: "Power Lifting Lab", trainerName: "Devon Brooks", schedule: "Tue · Thu · 7:00 PM", capacity: 12, enrolled: 9, durationMin: 60, category: "Strength" },
-  { id: "cls_03", name: "Vinyasa Flow", trainerName: "Maya Chen", schedule: "Daily · 9:00 AM", capacity: 24, enrolled: 22, durationMin: 60, category: "Yoga" },
-  { id: "cls_04", name: "Spin & Sweat", trainerName: "Sasha Lee", schedule: "Mon · Wed · Sat · 5:30 PM", capacity: 30, enrolled: 27, durationMin: 50, category: "Cardio" },
-  { id: "cls_05", name: "Mobility Reset", trainerName: "Maya Chen", schedule: "Sun · 10:00 AM", capacity: 16, enrolled: 7, durationMin: 40, category: "Recovery" },
-];

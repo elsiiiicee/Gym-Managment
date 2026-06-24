@@ -11,7 +11,6 @@ import {
   CreditCard,
   Wallet,
   CalendarCheck2,
-  Smartphone,
   Settings,
   ChevronLeft,
   ChevronRight,
@@ -37,8 +36,6 @@ const ITEMS: Item[] = [
   { href: "/admin/bookings", label: "Bookings", icon: CalendarCheck2, section: "Workspace" },
   { href: "/admin/memberships", label: "Plans", icon: CreditCard, section: "Money" },
   { href: "/admin/billing", label: "Billing", icon: Wallet, section: "Money" },
-  { href: "/admin/payroll", label: "Payroll", icon: Receipt, section: "Money" },
-  { href: "/admin/member-app", label: "Member app", icon: Smartphone, section: "Experience" },
   { href: "/admin/settings", label: "Settings", icon: Settings, section: "System" },
 ];
 

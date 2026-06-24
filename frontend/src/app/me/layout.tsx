@@ -8,7 +8,6 @@ import {
   CreditCard,
   Home,
   LogOut,
-  ScanLine,
   User2,
   type LucideIcon,
 } from "lucide-react";
@@ -24,7 +23,6 @@ interface NavItem {
 
 const NAV: NavItem[] = [
   { href: "/me", label: "Home", icon: Home },
-  { href: "/me/pass", label: "Pass", icon: ScanLine },
   { href: "/me/plans", label: "Plans", icon: CreditCard },
   { href: "/me/classes", label: "Classes", icon: CalendarCheck2 },
   { href: "/me/profile", label: "Profile", icon: User2 },

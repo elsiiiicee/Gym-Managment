@@ -10,7 +10,6 @@ import {
   CalendarCheck2,
   CreditCard,
   Receipt,
-  ScanLine,
   Wallet,
 } from "lucide-react";
 import {
@@ -213,24 +212,7 @@ export default function MeHomePage() {
       </div>
 
       {/* Quick actions */}
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-        <Link
-          href="/me/pass"
-          className="group flex items-center justify-between rounded-lg border bg-card p-4 transition hover:border-primary/40 hover:shadow-sm"
-        >
-          <div className="flex items-center gap-3">
-            <span className="grid h-10 w-10 place-items-center rounded-md bg-orange-500/15 text-orange-600 dark:text-orange-400">
-              <ScanLine className="h-4 w-4" />
-            </span>
-            <div>
-              <div className="font-medium">Door pass</div>
-              <div className="text-xs text-muted-foreground">
-                Scan at the gym
-              </div>
-            </div>
-          </div>
-          <ArrowRight className="h-4 w-4 text-muted-foreground transition group-hover:translate-x-0.5 group-hover:text-foreground" />
-        </Link>
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         <Link
           href="/me/plans"
           className="group flex items-center justify-between rounded-lg border bg-card p-4 transition hover:border-primary/40 hover:shadow-sm"

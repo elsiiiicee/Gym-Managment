@@ -44,12 +44,7 @@ export default function TrainersPage() {
       <PageHeader
         title="Trainers"
         description="The coaches who run the floor — ratings, specializations, and weekly load."
-        actions={
-          <Button onClick={() => toast.message("Invite trainer not wired yet")}>
-            <UserPlus className="h-4 w-4" />
-            Invite trainer
-          </Button>
-        }
+
       />
 
       {error && (

@@ -36,15 +36,6 @@ export default function MembershipsPage() {
       <PageHeader
         title="Memberships"
         description="The plans members can subscribe to. Each plan is priced for one billing period."
-        actions={
-          <Button
-            variant="outline"
-            onClick={() => toast.message("Plan editor not wired yet")}
-          >
-            <Plus className="h-4 w-4" />
-            New plan
-          </Button>
-        }
       />
 
       {error && (

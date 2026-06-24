@@ -878,7 +878,7 @@ graph LR
 **Burimi teorik:** Ch. 12. Frontend: Next.js 15 App Router, 17 faqe, temë "bold & energetic" (primar portokalli, kontrast i lartë). Screenshot-et reale: `docs/screenshots/` (Shtojca B).
 
 ### Inventari i ndërfaqeve (17 faqe reale)
-`/login`, `/me`, `/me/classes`, `/me/plans`, `/me/pass`, `/me/profile`, `/admin`, `/admin/users`, `/admin/classes`, `/admin/trainers`, `/admin/bookings`, `/admin/memberships`, `/admin/billing`, `/admin/payroll`, `/admin/member-app`, `/admin/settings`, `/` (ridrejtim).
+`/login`, `/me`, `/me/classes`, `/me/plans`, `/me/profile`, `/admin`, `/admin/users`, `/admin/classes`, `/admin/trainers`, `/admin/bookings`, `/admin/memberships`, `/admin/billing`, `/admin/payroll`, `/admin/settings`, `/` (ridrejtim).
 
 ### UI-01 — Login (Fig.13: `01-login.png`)
 | Aspekti | Përmbajtja |
@@ -906,14 +906,14 @@ graph LR
 |---|---|
 | Qëllimi / Roli | Vetë-shërbim; USER. |
 | Komponentët | "Your Credit" (bilanci real), "Current Plan", "Upcoming bookings", "Wallet activity" (transaksione reale). |
-| Veprime | Book a class, Membership plans, Door pass. |
+| Veprime | Book a class, Membership plans. |
 | Empty state | "No upcoming bookings" kur s'ka rezervime. |
 | Kërkesa / UC / Test | FR-08, FR-11, FR-17 / UC-04, UC-08 / TC-07, TC-19. |
 
 ### Ndërfaqe mbështetëse (të dokumentuara)
 - **UI-04 Admin/Users** (Fig.15): listë anëtarësh + dialog "Add credit" → FR-20, FR-26.
 - **UI-05 Admin/Payroll** (Fig.16): përmbledhje payroll + regjistrim payout → FR-28.
-- **UI-06 Me/Plans, Me/Classes, Me/Pass, Me/Profile:** blerje abonimi, rezervim klase, QR pass, profil.
+- **UI-06 Me/Plans, Me/Classes, Me/Profile:** blerje abonimi, rezervim klase, profil.
 
 ### Vlerësim përdorshmërie (Heuristikat e Nielsen-it)
 

@@ -30,6 +30,7 @@ import java.util.concurrent.Executors;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -129,6 +130,22 @@ public class AdminController {
         user.setRole(request.role());
         user.setActive(request.active());
         return UserAdminResponse.from(user);
+    }
+
+    @DeleteMapping("/users/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Transactional
+    void deleteUser(@PathVariable UUID id) {
+        UUID currentUserId = SecurityUtils.currentUserId();
+        AppUser user = users.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+        if (user.getRole() != UserRole.USER) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Only member accounts can be deleted");
+        }
+        if (user.getId().equals(currentUserId)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admins cannot delete their own account");
+        }
+        users.delete(user);
     }
 
     /**
