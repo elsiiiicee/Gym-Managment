@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+OWASP dependency-check suppressions.
+
+Add one <suppress> block per false-positive or accepted-risk CVE. Every
+suppression MUST include:
+  - the CVE ID
+  - a packageUrl regex pinning the artifact and version it covers
+  - a <notes> block stating WHY (false positive / mitigated / risk accepted by
+    whom, on what date, with what review cadence)
+
+Do not add blanket suppressions across versions; review will catch them.
+-->
+<suppressions xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.3.xsd">
+</suppressions>
