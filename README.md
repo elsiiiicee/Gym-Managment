@@ -12,8 +12,7 @@ panel — plus a member self-service app.
 
 ## Quick start (local, no database to install)
 
-You need **Java 21** and **Node.js 20+** installed. The backend runs on an
-in-memory H2 database, so there is nothing else to set up.
+You need **Java 21** and **Node.js 20+** installed..
 
 Open **two terminals** in the project root.
 
@@ -41,13 +40,6 @@ page to create a regular member and explore the member side (`/me`).
 ```bash
 # Backend: unit + integration tests with an 80% coverage gate
 APP_JWT_SECRET=ci-only-secret-at-least-32-bytes-long ./mvnw verify
-
-# Frontend: type-check and production build
-cd frontend
-npm ci
-npm run typecheck
-npm run build
-```
 
 ---
 
@@ -86,19 +78,5 @@ SPRING_DATASOURCE_PASSWORD=<password>
 APP_JWT_SECRET=<a strong secret, at least 32 bytes>
 ```
 
-The `prod` profile runs Flyway migrations and validates the schema on startup.
-See [docs/supabase.md](docs/supabase.md) for Supabase wiring and
-`scripts/run-stack.ps1` for a one-command Supabase-backed launch. Known gaps and
-hardening notes are tracked in
-[docs/production-readiness.md](docs/production-readiness.md).
-
 ---
 
-## Documentation
-
-- **[docs/dokument-projekti.md](docs/dokument-projekti.md)** — full Software
-  Engineering project document (Albanian): SRS, UML, risk/RMMM, test
-  specification, SQA, security, maintenance, deployment, and a requirements
-  traceability/audit. Grounded entirely in this codebase.
-- [docs/production-readiness.md](docs/production-readiness.md) — production gaps & hardening report.
-- [docs/supabase.md](docs/supabase.md) — Supabase/Postgres wiring.
