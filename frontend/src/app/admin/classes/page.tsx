@@ -63,8 +63,48 @@ function formatSchedule(startsAt: string, endsAt: string) {
 function toLocalInputValue(iso: string | undefined): string {
   if (!iso) return "";
   const d = new Date(iso);
+  return toLocalInputValueFromDate(d);
+}
+
+function toLocalInputValueFromDate(d: Date): string {
   const pad = (n: number) => String(n).padStart(2, "0");
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
+function fromLocalInputValue(value: string): Date | null {
+  const match = value.match(
+    /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})$/
+  );
+  if (!match) return null;
+  const [, year, month, day, hour, minute] = match;
+  const date = new Date(
+    Number(year),
+    Number(month) - 1,
+    Number(day),
+    Number(hour),
+    Number(minute),
+    0,
+    0
+  );
+  return Number.isNaN(date.getTime()) ? null : date;
+}
+
+function defaultClassTimes() {
+  const start = new Date();
+  start.setHours(start.getHours() + 1, 0, 0, 0);
+  const end = new Date(start);
+  end.setHours(end.getHours() + 1);
+  return {
+    startsAt: toLocalInputValueFromDate(start),
+    endsAt: toLocalInputValueFromDate(end),
+  };
+}
+
+function addMinutesToLocalInput(value: string, minutes: number): string {
+  const date = fromLocalInputValue(value);
+  if (!date) return "";
+  date.setMinutes(date.getMinutes() + minutes);
+  return toLocalInputValueFromDate(date);
 }
 
 export default function ClassesPage() {
@@ -277,12 +317,13 @@ function ClassDialog({
       setCapacity(cls.capacity);
       setPriceDollars((cls.priceCents ?? 0) / 100);
     } else {
+      const defaults = defaultClassTimes();
       setTrainerId("");
       setTitle("");
       setDescription("");
       setCategory("");
-      setStartsAt("");
-      setEndsAt("");
+      setStartsAt(defaults.startsAt);
+      setEndsAt(defaults.endsAt);
       setCapacity(20);
       setPriceDollars(0);
     }
@@ -321,9 +362,15 @@ function ClassDialog({
       setErrorMsg("Set a start and end time");
       return;
     }
-    const startsIso = new Date(startsAt).toISOString();
-    const endsIso = new Date(endsAt).toISOString();
-    if (new Date(startsAt) >= new Date(endsAt)) {
+    const startsDate = fromLocalInputValue(startsAt);
+    const endsDate = fromLocalInputValue(endsAt);
+    if (!startsDate || !endsDate) {
+      setErrorMsg("Use a valid start and end time");
+      return;
+    }
+    const startsIso = startsDate.toISOString();
+    const endsIso = endsDate.toISOString();
+    if (startsDate >= endsDate) {
       setErrorMsg("Start must be before end");
       return;
     }
@@ -342,7 +389,7 @@ function ClassDialog({
       });
     } else {
       // Backend's @Future on startsAt rejects past times.
-      if (new Date(startsAt) <= new Date()) {
+      if (startsDate <= new Date()) {
         setErrorMsg("Start time must be in the future");
         return;
       }
@@ -360,6 +407,17 @@ function ClassDialog({
   }
 
   const pending = create.isPending || update.isPending;
+  const minStart = toLocalInputValueFromDate(new Date());
+  const minEnd = startsAt || minStart;
+
+  function handleStartsAtChange(value: string) {
+    setStartsAt(value);
+    const startDate = fromLocalInputValue(value);
+    const endDate = fromLocalInputValue(endsAt);
+    if (startDate && (!endDate || endDate <= startDate)) {
+      setEndsAt(addMinutesToLocalInput(value, 60));
+    }
+  }
 
   return (
     <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
@@ -444,7 +502,8 @@ function ClassDialog({
               id="cls-starts"
               type="datetime-local"
               value={startsAt}
-              onChange={(e) => setStartsAt(e.target.value)}
+              min={cls ? undefined : minStart}
+              onChange={(e) => handleStartsAtChange(e.target.value)}
               required
             />
           </div>
@@ -454,6 +513,7 @@ function ClassDialog({
               id="cls-ends"
               type="datetime-local"
               value={endsAt}
+              min={minEnd}
               onChange={(e) => setEndsAt(e.target.value)}
               required
             />
